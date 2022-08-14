@@ -1,0 +1,87 @@
+CREATE DATABASE FORD;
+
+USE FORD;
+
+CREATE TABLE VEÍCULO (
+ID_VEÍCULO INT PRIMARY KEY, 
+MODELO VARCHAR(50), 
+MOTOR VARCHAR(05), 
+POTENCIA INT, 
+CAPACIDADE_CARGA INT, 
+PRECO FLOAT
+);
+
+CREATE TABLE CLIENTE (
+ID_CLIENTE INT PRIMARY KEY,
+NOME VARCHAR(50), 
+SOBRENOME VARCHAR(50),
+CPF CHAR(11),
+EMAIL VARCHAR(30),
+TELEFONE VARCHAR(15),
+FORMA_CONTATO CHAR(01),
+ID_VEÍCULO INT NULL,
+FOREIGN KEY (ID_VEÍCULO) REFERENCES VEÍCULO(ID_VEÍCULO),
+DATA_COMPRA DATE NULL
+);
+
+/*Inserindo dados de veículos*/
+INSERT INTO VEÍCULO(ID_VEÍCULO, MODELO, MOTOR, POTENCIA, CAPACIDADE_CARGA , PRECO)
+    VALUES(1, 'XL Cabine Simples 2.2 Diesel 4X4 MT 2022', '2.2', 160, 1234, 183850.00);
+INSERT INTO VEÍCULO(ID_VEÍCULO, MODELO, MOTOR, POTENCIA, CAPACIDADE_CARGA , PRECO)
+    VALUES(2, 'XLS 2.2 Diesel 4X4 AT 2022', '2.2', 160, 976, 220690.00);
+INSERT INTO VEÍCULO(ID_VEÍCULO, MODELO, MOTOR, POTENCIA, CAPACIDADE_CARGA , PRECO)
+    VALUES(3, 'Storm 3.2 Diesel 4X4 AT 2022', '3.2', 200, 1040, 222790.00);
+
+/*Inserido dados de clientes*/
+INSERT INTO CLIENTE(ID_CLIENTE, NOME, SOBRENOME, CPF, EMAIL, TELEFONE, FORMA_CONTATO, ID_VEÍCULO, DATA_COMPRA)
+    VALUES(1, 'JOSÉ', 'SILVA', 1234567,'jose@tst.com', '71 2222 2222', 1, 3, '2020-12-15');
+INSERT INTO CLIENTE(ID_CLIENTE, NOME, SOBRENOME, CPF, EMAIL, TELEFONE, FORMA_CONTATO, ID_VEÍCULO, DATA_COMPRA)
+    VALUES(2, 'MARIA', 'SANTOS', 2345678, 'maria@prp.com', '71 3333 3333', 2, 2, '2020-12-20');
+INSERT INTO CLIENTE(ID_CLIENTE, NOME, SOBRENOME, CPF, EMAIL, TELEFONE, FORMA_CONTATO, ID_VEÍCULO, DATA_COMPRA)
+    VALUES(3, 'JOÃO', 'NEVES', 3456789, 'joao@tst.com', '71 4444 4444', 1, 2, '2021-08-03');
+INSERT INTO CLIENTE(ID_CLIENTE, NOME, SOBRENOME, CPF, EMAIL, TELEFONE, FORMA_CONTATO, ID_VEÍCULO, DATA_COMPRA)
+    VALUES(4, 'CARLA', 'SANTANA', 3333333, 'carla@prp.com', '71 5555 5555', 2, NULL, NULL);
+    
+/*1- Alterando capacidade de carga do veículo 2*/
+UPDATE VEÍCULO SET CAPACIDADE_CARGA = 1076 
+WHERE ID_VEÍCULO = 2; 
+
+/*2- Apresentando modelo, motor e potência dos veículos com preço maior que 200.000,00 e motor maior que 3*/
+SELECT MODELO, MOTOR, POTENCIA FROM VEÍCULO 
+WHERE PRECO > 200000.00 AND MOTOR > 3.0; 
+
+/*3- Apresentar o nome, sobrenome e e-mail dos clientes cujo CPF começa com o caractere ‘3’, ordenados pelo nome 
+de forma ascendente, cujo*/
+SELECT NOME, SOBRENOME, EMAIL FROM CLIENTE
+WHERE CPF LIKE '3%' ORDER BY NOME ASC;
+
+/*4- Apresentando modelo dos veículos, nome e sobrenome dos clientes que os compraram, ordenados pelo modelo 
+do veículo de forma decrescente e pelo nome do cliente em ordem crescente*/
+SELECT V.MODELO, C.NOME, C.SOBRENOME FROM 
+CLIENTE C INNER JOIN VEÍCULO V
+ON C.ID_VEÍCULO = V.ID_VEÍCULO ORDER BY V.MODELO DESC, C.NOME ASC;
+
+/*5- Apresentando nome do cliente, data da compra e preço do veículo comprado, ordenados pelo nome do cliente 
+de forma crescente. Aprensentando também clientes que não compraram veículos*/
+SELECT C.NOME, C.DATA_COMPRA, V.PRECO FROM
+CLIENTE C LEFT JOIN VEÍCULO V
+ON C.ID_VEÍCULO = V.ID_VEÍCULO ORDER BY C.NOME ASC;
+
+/*6- Apresentando modelos dos veículos e quantidade de clientes que os compraram*/
+SELECT V.MODELO, COUNT(*) AS QTDE_COMPRADORES FROM CLIENTE C INNER JOIN VEÍCULO V
+ON C.ID_VEÍCULO = V.ID_VEÍCULO GROUP BY V.MODELO ;
+
+/*7- Criando view que apresente o somatório dos preços dos veículos vendidos por ano*/
+CREATE VIEW VW_TOTAL_VENDAS_ANO AS
+SELECT YEAR(C.DATA_COMPRA) AS ANO, SUM(V.PRECO) AS 
+TOTAL_VENDAS FROM CLIENTE C INNER JOIN VEÍCULO V
+ON C.ID_VEÍCULO = V.ID_VEÍCULO GROUP BY YEAR (C.DATA_COMPRA);
+
+SELECT * FROM VW_TOTAL_VENDAS_ANO;
+
+/* Excluindo da tabela usuário o registro da cliente Carla Santana*/
+DELETE FROM CLIENTE WHERE ID_CLIENTE = 4;
+ 
+SELECT * FROM CLIENTE;
+
+
